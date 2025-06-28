@@ -13,6 +13,7 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
+        # persist-credentials is true by default, so GITHUB_TOKEN can push back
 
       - name: Generate config/settings.yaml
         run: |
@@ -34,14 +35,18 @@ jobs:
 
       - name: Run Forecast Bot
         run: python src/fetch_forecast.py
+        env:
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
 
       - name: Commit updated CSV & seen_ids
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: 'chore: update processed CSV and seen_ids'
+          # commit only those two files
           file_pattern: |
             data/processed/filtered_forecast.csv
             data/processed/seen_ids.json
+          commit_message: 'chore: update processed CSV and seen_ids'
           branch: main
-          author_name: 'github-actions'
-          author_email: 'github-actions@github.com'
+          # use the inputs this action expects:
+          commit_user_name: 'github-actions'
+          commit_user_email: 'github-actions@github.com'
