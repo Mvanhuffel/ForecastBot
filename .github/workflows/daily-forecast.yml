@@ -1,0 +1,41 @@
+name: Daily Forecast Bot
+
+on:
+  schedule:
+    # runs every weekday at 9 AM ET (13:00 UTC)
+    - cron: '0 13 * * 1-5'
+  workflow_dispatch:  # allows manual trigger
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Forecast Bot
+        env:
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
+        run: python src/fetch_forecast.py
+
+      - name: Commit updated CSV & seen_ids
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: chore: update processed CSV and seen_ids
+          file_pattern: |
+            data/processed/filtered_forecast.csv
+            data/processed/seen_ids.json
+          branch: main
+          author_name: github-actions
+          author_email: github-actions@github.com
