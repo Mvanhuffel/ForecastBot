@@ -14,6 +14,14 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      - name: Generate config/settings.yaml
+        run: |
+          mkdir -p config
+          cat <<EOF > config/settings.yaml
+          teams:
+            webhook_url: "${{ secrets.TEAMS_WEBHOOK_URL }}"
+          EOF
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -26,8 +34,6 @@ jobs:
 
       - name: Run Forecast Bot
         run: python src/fetch_forecast.py
-        env:
-          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
 
       - name: Commit updated CSV & seen_ids
         uses: stefanzweifel/git-auto-commit-action@v4
