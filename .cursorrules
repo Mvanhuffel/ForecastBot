@@ -1,0 +1,10 @@
+// Modular Code
+// Break functionality into small, focused units (functions, classes, or modules) each with a single responsibility.
+// Prefer reusing existing utilities over writing new one-off functions for each feature.
+
+// Preserve README.md
+// Do not modify README.md; all edits to project documentation must be done manually.
+
+// Document PROJECT MILESTONES concisely
+// When a feature is added or removed, append a one-line, very concise entry to PROJECTMILESTONES.md; never alter or delete existing lines.
+

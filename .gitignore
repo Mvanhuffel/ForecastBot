@@ -1,0 +1,23 @@
+# Python virtual environment
+.venv/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Logs
+logs/
+
+# Processed data outputs
+data/processed/
+
+# Environment variable file
+.env
+
+# Config file with secrets
+config/settings.yaml
+
+# OS and editor files
+.DS_Store
+Thumbs.db
