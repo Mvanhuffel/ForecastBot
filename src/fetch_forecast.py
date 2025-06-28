@@ -29,9 +29,9 @@ handler  = RotatingFileHandler(log_path, maxBytes=5 * 1024 * 1024, backupCount=3
 handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
 logger.addHandler(handler)
 
-# Path to seen-IDs file
-data_dir       = os.path.join(project_root, "data", "processed")
-seen_ids_path  = os.path.join(data_dir, "seen_ids.json")
+# Paths for data & seen-IDs
+data_dir      = os.path.join(project_root, "data", "processed")
+seen_ids_path = os.path.join(data_dir, "seen_ids.json")
 os.makedirs(data_dir, exist_ok=True)
 
 def fetch_forecast() -> pd.DataFrame:
@@ -49,7 +49,7 @@ def post_to_teams(webhook_url: str, message: str):
 
 def load_seen_ids() -> set:
     try:
-        with open(seen_ids_path, "r") as f:
+        with open(seen_ids_path) as f:
             return set(json.load(f))
     except (FileNotFoundError, json.JSONDecodeError):
         return set()
@@ -61,29 +61,29 @@ def save_seen_ids(seen: set):
 def main():
     logger.info("Run started")
     try:
-        # 1) Fetch and normalize
+        # Fetch & normalize
         df = fetch_forecast()
         df.columns = df.columns.str.upper()
 
-        # 2) Filter on NAICS
+        # Filter on NAICS
         target      = "541612 - Human Resources Consulting Services"
         df_filtered = df[df["NAICS"] == target]
         logger.info(f"Rows after filter: {len(df_filtered)}")
 
-        # 3) Load previously seen IDs and compute new rows
+        # Determine newly unseen rows
         seen_ids = load_seen_ids()
-        new_df = df_filtered[~df_filtered["ID"].isin(seen_ids)]
+        new_df   = df_filtered[~df_filtered["ID"].isin(seen_ids)]
         if new_df.empty:
             logger.info("No new opportunities—nothing to post.")
             return
 
-        # 4) Write full CSV (as before)
+        # Write full filtered CSV
         output_path = os.path.join(data_dir, "filtered_forecast.csv")
         df_filtered.to_csv(output_path, index=False)
         logger.info(f"Wrote filtered data to {output_path}")
 
-        # 5) Build and send summary for just the NEW rows
-        cols = [
+        # Build HTML summary blocks for new_df
+        cols   = [
             "ORGANIZATION",
             "NAICS",
             "ESTIMATED_PERIOD_OF_PERFORMANCE_START",
@@ -93,9 +93,9 @@ def main():
         ]
         blocks = []
         for _, row in new_df[cols].iterrows():
-            dr = row["DOLLAR_RANGE"]
+            dr      = row["DOLLAR_RANGE"]
             dr_name = dr.get("display_name") if isinstance(dr, dict) else dr
-            block = (
+            blocks.append(
                 f"**Organization:** {row['ORGANIZATION']}<br/>"
                 f"**NAICS:** {row['NAICS']}<br/>"
                 f"**Est. Start:** {row['ESTIMATED_PERIOD_OF_PERFORMANCE_START']}<br/>"
@@ -103,23 +103,33 @@ def main():
                 f"**Competitive:** {row['COMPETITIVE']}<br/>"
                 f"**Requirement:** {row['REQUIREMENT']}<br/>"
             )
-            blocks.append(block)
 
-        # build header with timestamp
+        # Header with timestamp
         now    = datetime.now(ZoneInfo("America/New_York"))
         pulled = now.strftime("%B %d, %Y at %I:%M %p ET")
         header = (
             f"✅ **Forecast Bot Summary** ({len(blocks)} new opportunities)<br/>"
             f"{pulled}<br/><br/>"
         )
-        message = header + "<br/><br/>".join(blocks)
+
+        # Links at the end
+        csv_url  = "https://raw.githubusercontent.com/Mvanhuffel/ForecastBot/main/data/processed/filtered_forecast.csv"
+        site_url = "https://apfs-cloud.dhs.gov/forecast/"
+        links_html = (
+            f'<br/><br/><a href="{csv_url}">Download the latest filtered CSV</a>'
+            f'<br/><br/><a href="{site_url}">Visit the APFS Forecast site</a>'
+        )
+
+        # Combine and post
+        message = header + "<br/><br/>".join(blocks) + links_html
         post_to_teams(teams_webhook, message)
 
-        # 6) Update seen IDs and save
+        # Persist seen IDs
         seen_ids |= set(new_df["ID"])
         save_seen_ids(seen_ids)
 
         logger.info("Run completed successfully")
+
     except Exception:
         logger.exception("Run failed with an error")
         sys.exit(1)
