@@ -4,7 +4,7 @@ on:
   schedule:
     # runs every weekday at 9 AM ET (13:00 UTC)
     - cron: '0 13 * * 1-5'
-  workflow_dispatch:  # allows manual trigger
+  workflow_dispatch:
 
 jobs:
   run-bot:
@@ -25,17 +25,17 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run Forecast Bot
+        run: python src/fetch_forecast.py
         env:
           TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
-        run: python src/fetch_forecast.py
 
       - name: Commit updated CSV & seen_ids
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: chore: update processed CSV and seen_ids
+          commit_message: 'chore: update processed CSV and seen_ids'
           file_pattern: |
             data/processed/filtered_forecast.csv
             data/processed/seen_ids.json
           branch: main
-          author_name: github-actions
-          author_email: github-actions@github.com
+          author_name: 'github-actions'
+          author_email: 'github-actions@github.com'
