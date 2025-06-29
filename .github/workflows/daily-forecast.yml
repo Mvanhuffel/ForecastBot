@@ -57,24 +57,10 @@ jobs:
           commit_user_name: 'github-actions'
           commit_user_email: 'github-actions@github.com'
 
-      - name: Create or update GitHub Release
-        id: create_release
-        uses: actions/create-release@v1.1.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish CSV as “latest” release asset
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: latest
-          release_name: "Latest Filtered Forecast CSV"
-          draft: false
-          prerelease: false
-          allow_updates: true
-
-      - name: Upload CSV as release asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: data/processed/filtered_forecast.csv
-          asset_name: filtered_forecast.csv
-          asset_content_type: text/csv
+          tag: latest
+          name: Latest Filtered Forecast CSV
+          files: data/processed/filtered_forecast.csv
+          overwrite: true
