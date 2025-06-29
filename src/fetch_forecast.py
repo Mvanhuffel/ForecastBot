@@ -112,16 +112,18 @@ def main():
             f"{pulled}<br/><br/>"
         )
 
-        # Links at the end
-        csv_url  = "hhttps://github.com/Mvanhuffel/ForecastBot/releases/latest/download/filtered_forecast.csv"
+        # Links at the end (Markdown syntax for clickable links in Teams)
+        csv_url  = "https://github.com/Mvanhuffel/ForecastBot/releases/latest/download/filtered_forecast.csv"
         site_url = "https://apfs-cloud.dhs.gov/forecast/"
-        links_html = (
-            f'<br/><br/><a href="{csv_url}">Download the latest filtered CSV</a>'
-             f'<br/><br/><a href="{site_url}">Visit the APFS Forecast site</a>'
+        links_md = (
+            "\n\n"
+            f"[Download the latest filtered CSV]({csv_url})"
+            "\n\n"
+            f"[Visit the APFS Forecast site]({site_url})"
         )
 
         # Combine and post
-        message = header + "<br/><br/>".join(blocks) + links_html
+        message = header + "<br/><br/>".join(blocks) + links_md
         post_to_teams(teams_webhook, message)
 
         # Persist seen IDs
