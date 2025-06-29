@@ -113,11 +113,11 @@ def main():
         )
 
         # Links at the end
-        csv_url  = "https://raw.githubusercontent.com/Mvanhuffel/ForecastBot/main/data/processed/filtered_forecast.csv"
+        csv_url  = "hhttps://github.com/Mvanhuffel/ForecastBot/releases/latest/download/filtered_forecast.csv"
         site_url = "https://apfs-cloud.dhs.gov/forecast/"
         links_html = (
             f'<br/><br/><a href="{csv_url}">Download the latest filtered CSV</a>'
-            f'<br/><br/><a href="{site_url}">Visit the APFS Forecast site</a>'
+             f'<br/><br/><a href="{site_url}">Visit the APFS Forecast site</a>'
         )
 
         # Combine and post

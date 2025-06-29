@@ -1,22 +1,25 @@
 name: Daily Forecast Bot
 
-# give the GITHUB_TOKEN write access so our commit step can push
+# grant the GITHUB_TOKEN write access so our commit step can push
 permissions:
   contents: write
 
 on:
   schedule:
+    # runs every weekday at 9 AM ET (13:00 UTC)
     - cron: '0 13 * * 1-5'
   workflow_dispatch:
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
           persist-credentials: true
+          fetch-depth: 0
 
       - name: Generate config/settings.yaml
         run: |
@@ -53,3 +56,25 @@ jobs:
           branch: main
           commit_user_name: 'github-actions'
           commit_user_email: 'github-actions@github.com'
+
+      - name: Create or update GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: latest
+          release_name: "Latest Filtered Forecast CSV"
+          draft: false
+          prerelease: false
+          allow_updates: true
+
+      - name: Upload CSV as release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: data/processed/filtered_forecast.csv
+          asset_name: filtered_forecast.csv
+          asset_content_type: text/csv
