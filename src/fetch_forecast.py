@@ -109,20 +109,19 @@ def main():
         pulled = now.strftime("%B %d, %Y at %I:%M %p ET")
         header = (
             f"✅ **Forecast Bot Summary** ({len(blocks)} new opportunities)<br/>"
-            f"{pulled}<br/><br/>"
+            f"{pulled}<br/>"
         )
 
-        # Links immediately after header (Markdown for clickable Teams links)
+        # Links immediately after header on the same level, with pipe separator
         csv_url  = "https://github.com/Mvanhuffel/ForecastBot/releases/latest/download/filtered_forecast.csv"
         site_url = "https://apfs-cloud.dhs.gov/forecast/"
-        links_md = (
-            "\n\n"
-            f"[Download the latest filtered CSV]({csv_url})   [Visit the APFS Forecast site]({site_url})"
-            "\n\n"
+        links_html = (
+            f"[Download the latest filtered CSV]({csv_url}) | "
+            f"[Visit the APFS Forecast site]({site_url})<br/><br/>"
         )
 
         # Combine and post: header → links → details
-        message = header + links_md + "<br/><br/>".join(blocks)
+        message = header + links_html + "<br/><br/>".join(blocks)
         post_to_teams(teams_webhook, message)
 
         # Persist seen IDs
@@ -130,6 +129,7 @@ def main():
         save_seen_ids(seen_ids)
 
         logger.info("Run completed successfully")
+
     except Exception:
         logger.exception("Run failed with an error")
         sys.exit(1)
