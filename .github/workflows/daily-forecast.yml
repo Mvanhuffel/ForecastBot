@@ -60,7 +60,8 @@ jobs:
       - name: Publish CSV as “latest” release asset
         uses: ncipollo/release-action@v1
         with:
-          tag: latest
-          name: Latest Filtered Forecast CSV
-          files: data/processed/filtered_forecast.csv
-          overwrite: true
+          token: ${{ secrets.GITHUB_TOKEN }}                 # allow authentication
+          tag: latest                                        # release tag
+          name: Latest Filtered Forecast CSV                 # human-readable title
+          artifacts: data/processed/filtered_forecast.csv    # file(s) to upload
+          allowUpdates: true                                 # overwrite existing asset
