@@ -112,18 +112,17 @@ def main():
             f"{pulled}<br/><br/>"
         )
 
-        # Links at the end (Markdown syntax for clickable links in Teams)
+        # Links immediately after header (Markdown for clickable Teams links)
         csv_url  = "https://github.com/Mvanhuffel/ForecastBot/releases/latest/download/filtered_forecast.csv"
         site_url = "https://apfs-cloud.dhs.gov/forecast/"
         links_md = (
             "\n\n"
-            f"[Download the latest filtered CSV]({csv_url})"
+            f"[Download the latest filtered CSV]({csv_url})   [Visit the APFS Forecast site]({site_url})"
             "\n\n"
-            f"[Visit the APFS Forecast site]({site_url})"
         )
 
-        # Combine and post
-        message = header + "<br/><br/>".join(blocks) + links_md
+        # Combine and post: header → links → details
+        message = header + links_md + "<br/><br/>".join(blocks)
         post_to_teams(teams_webhook, message)
 
         # Persist seen IDs
@@ -131,7 +130,6 @@ def main():
         save_seen_ids(seen_ids)
 
         logger.info("Run completed successfully")
-
     except Exception:
         logger.exception("Run failed with an error")
         sys.exit(1)
