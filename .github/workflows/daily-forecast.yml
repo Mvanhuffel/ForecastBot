@@ -87,11 +87,16 @@ jobs:
           commit_user_name: 'github-actions'
           commit_user_email: 'github-actions@github.com'
 
-      - name: Publish CSV as "latest" release asset
+      - name: Get today's date
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+
+      - name: Create dated release with CSV
         uses: ncipollo/release-action@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}                 # allow authentication
-          tag: latest                                        # release tag
-          name: Latest Filtered Forecast CSV                 # human-readable title
-          artifacts: data/processed/filtered_forecast.csv    # file(s) to upload
-          allowUpdates: true                                 # overwrite existing asset
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: forecast-${{ steps.date.outputs.date }}
+          name: Forecast Data ${{ steps.date.outputs.date }}
+          artifacts: "data/processed/filtered_forecast_${{ steps.date.outputs.date }}.csv"
+          allowUpdates: false
+          makeLatest: false
