@@ -72,8 +72,11 @@ def main():
 
         # Determine newly unseen rows
         seen_ids = load_seen_ids()
-        new_df   = df_filtered[~df_filtered["ID"].isin(seen_ids)]
-        if new_df.empty:
+        ids_list = df_filtered["ID"].tolist()
+        mask     = [row_id not in seen_ids for row_id in ids_list]
+        new_df   = df_filtered.loc[mask]
+
+        if new_df.shape[0] == 0:
             logger.info("No new opportunities—nothing to post.")
             return
 
