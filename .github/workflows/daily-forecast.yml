@@ -1,15 +1,17 @@
 name: Daily Forecast Bot
 
+# give the GITHUB_TOKEN write access so our commit step can push
+permissions:
+  contents: write
+
 on:
   schedule:
-    # runs every weekday at 9 AM ET (13:00 UTC)
     - cron: '0 13 * * 1-5'
   workflow_dispatch:
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
