@@ -41,12 +41,11 @@ jobs:
       - name: Commit updated CSV & seen_ids
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          # commit only those two files
+          token: ${{ secrets.GITHUB_TOKEN }}
           file_pattern: |
             data/processed/filtered_forecast.csv
             data/processed/seen_ids.json
           commit_message: 'chore: update processed CSV and seen_ids'
           branch: main
-          # use the inputs this action expects:
           commit_user_name: 'github-actions'
           commit_user_email: 'github-actions@github.com'
