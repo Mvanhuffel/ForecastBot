@@ -44,20 +44,50 @@ jobs:
         env:
           TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
 
-      - name: Commit updated CSV & seen_ids
+      - name: Cleanup old forecast files
+        run: |
+          # Find and remove CSV files older than 30 days
+          python -c '
+          import os
+          import glob
+          from datetime import datetime, timedelta
+          
+          # Get all dated forecast files
+          pattern = "data/processed/filtered_forecast_*.csv"
+          files = glob.glob(pattern)
+          
+          # Calculate cutoff date (30 days ago)
+          cutoff = datetime.now() - timedelta(days=30)
+          
+          # Remove files older than cutoff
+          for file in files:
+              # Extract date from filename (format: filtered_forecast_YYYY-MM-DD.csv)
+              try:
+                  date_str = file.split("filtered_forecast_")[1].replace(".csv", "")
+                  file_date = datetime.strptime(date_str, "%Y-%m-%d")
+                  
+                  if file_date < cutoff:
+                      os.remove(file)
+                      print(f"Removed old file: {file}")
+              except (IndexError, ValueError):
+                  print(f"Skipping file with invalid date format: {file}")
+          '
+
+      - name: Commit updated files
         uses: stefanzweifel/git-auto-commit-action@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           file_pattern: |
+            data/processed/filtered_forecast_*.csv
             data/processed/filtered_forecast.csv
             data/processed/seen_ids.json
-          commit_message: 'chore: update processed CSV and seen_ids'
+          commit_message: 'chore: update forecast data and cleanup old files'
           branch: main
           commit_user_name: 'github-actions'
           commit_user_email: 'github-actions@github.com'
 
-      - name: Publish CSV as “latest” release asset
+      - name: Publish CSV as "latest" release asset
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}                 # allow authentication

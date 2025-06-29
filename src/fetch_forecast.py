@@ -77,10 +77,18 @@ def main():
             logger.info("No new opportunities—nothing to post.")
             return
 
-        # Write full filtered CSV
-        output_path = os.path.join(data_dir, "filtered_forecast.csv")
-        df_filtered.to_csv(output_path, index=False)
-        logger.info(f"Wrote filtered data to {output_path}")
+        # Write full filtered CSV with date-based filename
+        today = datetime.now(ZoneInfo("America/New_York")).strftime("%Y-%m-%d")
+        dated_output_path = os.path.join(data_dir, f"filtered_forecast_{today}.csv")
+        latest_output_path = os.path.join(data_dir, "filtered_forecast.csv")
+        
+        # Write to dated file
+        df_filtered.to_csv(dated_output_path, index=False)
+        logger.info(f"Wrote filtered data to {dated_output_path}")
+        
+        # Copy to latest
+        df_filtered.to_csv(latest_output_path, index=False)
+        logger.info(f"Updated latest filtered data at {latest_output_path}")
 
         # Build HTML summary blocks for new_df
         cols   = [
