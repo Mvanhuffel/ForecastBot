@@ -20,9 +20,9 @@ jobs:
         run: |
           mkdir -p config
           cat <<EOF > config/settings.yaml
-teams:
-  webhook_url: "${{ secrets.TEAMS_WEBHOOK_URL }}"
-EOF
+          teams:
+            webhook_url: "${{ secrets.TEAMS_WEBHOOK_URL }}"
+          EOF
 
       - name: Set up Python
         uses: actions/setup-python@v4
