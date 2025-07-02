@@ -17,9 +17,13 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
+
+      - name: Download previous seen_ids
+        uses: actions/download-artifact@v3
+        continue-on-error: true  # First run won't have the artifact
         with:
-          persist-credentials: true
-          fetch-depth: 0
+          name: seen-ids
+          path: data/processed
 
       - name: Generate config/settings.yaml
         run: |
@@ -43,6 +47,13 @@ jobs:
         run: python src/fetch_forecast.py
         env:
           TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
+
+      - name: Upload seen_ids artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: seen-ids
+          path: data/processed/seen_ids.json
+          retention-days: 90  # Keep artifact for 90 days
 
       - name: Cleanup old forecast files
         run: |
@@ -72,20 +83,6 @@ jobs:
               except (IndexError, ValueError):
                   print(f"Skipping file with invalid date format: {file}")
           '
-
-      - name: Commit updated files
-        uses: stefanzweifel/git-auto-commit-action@v4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          file_pattern: |
-            data/processed/filtered_forecast_*.csv
-            data/processed/filtered_forecast.csv
-            data/processed/seen_ids.json
-          commit_message: 'chore: update forecast data and cleanup old files'
-          branch: main
-          commit_user_name: 'github-actions'
-          commit_user_email: 'github-actions@github.com'
 
       - name: Get today's date
         id: date

@@ -5,10 +5,11 @@
 2025-06-27: Enhanced summary formatting using `<br/>` for clear line breaks.
 2025-06-27: Created comprehensive README.md with setup and usage instructions.
 2025-06-27: Defined Cursor best-practice rules in .cursorrules.
-2025-06-27: Outlined persistence plan for “seen” IDs to enable delta-only posting.
+2025-06-27: Outlined persistence plan for "seen" IDs to enable delta-only posting.
 2025-06-28: Initialized GitHub repository and pushed initial commit.
 2025-06-28: Added GitHub Actions workflow for scheduled weekday and manual runs.
 2025-06-28: CI step added to generate config/settings.yaml from the TEAMS_WEBHOOK_URL secret.
 2025-06-28: Implemented seen_ids.json persistence to enable delta-only posting of new opportunities.
 2025-06-28: Updated Teams notification header to include human-friendly timestamp.
 2025-06-28: Reordered summary fields in the Teams message for improved readability.
+2025-07-02: Switched seen_ids.json persistence from git commits to GitHub Actions artifacts to fix reposting issues.

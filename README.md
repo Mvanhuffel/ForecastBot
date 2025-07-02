@@ -90,6 +90,16 @@ All runtime settings live in `config/settings.yaml` (overridable via environment
 - **Logs**: `logs/forecast_bot.log` (rotates at 5 MB, keeps 3 backups)  
 - **Filtered CSV**: `data/processed/filtered_forecast.csv`
 
+## Data Persistence
+
+The bot uses GitHub Actions artifacts and releases to maintain state and archive data:
+
+- **Seen Opportunities**: The bot tracks which opportunities it has already posted using `seen_ids.json`, which is maintained as a GitHub Actions artifact with a 90-day retention period. This ensures reliable state persistence between workflow runs and prevents reposting of opportunities. The file appears empty in the repository because it's managed entirely through GitHub Actions artifacts.
+
+- **Forecast Archives**: Daily forecast CSV files (e.g., `filtered_forecast_2025-07-02.csv`) are published as GitHub Releases rather than being committed to the repository. These are accessible via the "Download the latest filtered CSV" link in Teams messages, keeping historical data available without bloating the repository.
+
+This design ensures efficient data persistence while keeping the repository clean and focused on source code.
+
 ## Next Steps
 
 - Add unit tests under `tests/` (e.g. for `fetch_forecast()` and filter logic)  
