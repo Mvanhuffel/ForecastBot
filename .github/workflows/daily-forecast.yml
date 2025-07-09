@@ -22,7 +22,7 @@ jobs:
         uses: actions/download-artifact@v4
         continue-on-error: true  # First run won't have the artifact
         with:
-          name: seen-ids
+          name: seen-ids-v2  # Updated to use v2 artifact name
           path: data/processed
 
       - name: Generate config/settings.yaml
@@ -43,16 +43,19 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # To revert to the old version:
+      # 1. Change this step to use fetch_forecast.py
+      # 2. Change the artifact names back to 'seen-ids'
       - name: Run Forecast Bot
-        run: python src/fetch_forecast.py
+        run: python src/fetch_forecast_v2.py
         env:
           TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
 
       - name: Upload seen_ids artifact
         uses: actions/upload-artifact@v4
         with:
-          name: seen-ids
-          path: data/processed/seen_ids.json
+          name: seen-ids-v2  # Updated to use v2 artifact name
+          path: data/processed/seen_ids_v2.json  # Updated to use v2 json file
           retention-days: 90  # Keep artifact for 90 days
 
       - name: Cleanup old forecast files
