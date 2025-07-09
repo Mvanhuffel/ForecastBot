@@ -98,5 +98,6 @@ jobs:
           tag: forecast-${{ steps.date.outputs.date }}
           name: Forecast Data ${{ steps.date.outputs.date }}
           artifacts: "data/processed/filtered_forecast_${{ steps.date.outputs.date }}.csv"
-          allowUpdates: false
+          allowUpdates: true  # Allow updating existing release
           makeLatest: false
+          updateOnlyUnreleased: false  # Allow updating already released versions
